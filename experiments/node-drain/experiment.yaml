@@ -1,0 +1,47 @@
+version: 0.1.0
+title: Node Drain
+description: N/A
+tags: []
+steady-state-hypothesis:
+    title: We have the expected number of pods
+    probes:
+    -   type: probe
+        name: check-frontend-pod-running
+        tolerance: [2, 3]
+        provider:
+            type: python
+            module: chaosk8s.pod.probes
+            func: count_pods
+            arguments:
+                label_selector: app=frontend
+                phase: Running
+                ns: chaos-toolkit-playground
+    - type: probe
+      name: check-frontend-is-reachable
+      tolerance: 200
+      provider:
+          type: http
+          timeout: 30
+          verify_tls: false
+          url: "http://localhost:8080"
+method:
+-   type: action
+    name: drain_nodes
+    provider:
+        type: python
+        module: chaosk8s.node.actions
+        func: drain_nodes
+        arguments:
+            label_selector: 'topology.kubernetes.io/zone=playground-1a'
+            delete_pods_with_local_storage: true
+            timeout: 120
+            count: 1
+rollbacks:
+-   type: action
+    name: uncordon_node
+    provider:
+        type: python
+        module: chaosk8s.node.actions
+        func: uncordon_node
+        arguments:
+            label_selector: 'topology.kubernetes.io/zone=playground-1a'

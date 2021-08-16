@@ -1,0 +1,7 @@
+# Python
+venv
+
+# Chaos Toolkit
+*.log
+journal.json
+discovery.json

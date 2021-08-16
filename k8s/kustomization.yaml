@@ -1,0 +1,7 @@
+namespace: chaos-toolkit-playground
+resources:
+  - namespace.yaml
+  - microservices-demo.yaml
+patchesStrategicMerge:
+  - patches/increase-frontend-replicas.yaml
+  - patches/set-frontend-affinity.yaml
